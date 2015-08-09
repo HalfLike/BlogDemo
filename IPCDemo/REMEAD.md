@@ -45,5 +45,5 @@ Serializable 使用简单只需要注明实现即可不需要实现额外的方�
 ---
 [Android Activity和Intent机制学习笔记](http://www.cnblogs.com/feisky/archive/2010/01/16/1649081.html)
 
-[Intent 官方文档](http://developer.android.com/reference/android/content/Intent.html#putExtra(java.lang.String, android.os.Bundle)
+[Intent 官方文档](http://developer.android.com/reference/android/content/Intent.html)
 
