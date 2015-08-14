@@ -1,1 +1,1 @@
-include ':messengerdemo'
+include ':messengerdemo', ':aidlclient', ':aidlserver'

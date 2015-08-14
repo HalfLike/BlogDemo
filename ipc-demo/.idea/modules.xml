@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/IPCDemo.iml" filepath="$PROJECT_DIR$/IPCDemo.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/messengerdemo.iml" filepath="$PROJECT_DIR$/app/messengerdemo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/aidlclient/aidlclient.iml" filepath="$PROJECT_DIR$/aidlclient/aidlclient.iml" />
+      <module fileurl="file://$PROJECT_DIR$/aidlserver/aidlserver.iml" filepath="$PROJECT_DIR$/aidlserver/aidlserver.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ipc-demo.iml" filepath="$PROJECT_DIR$/ipc-demo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/messengerdemo/messengerdemo.iml" filepath="$PROJECT_DIR$/messengerdemo/messengerdemo.iml" />
     </modules>
   </component>
 </project>
