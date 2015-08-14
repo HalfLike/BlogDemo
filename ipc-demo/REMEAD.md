@@ -216,13 +216,17 @@ public class ClientActivity extends Activity {
 使用 AIDL 通信
 ---
 
+Android 是进程间内存是分离的，因此需要将对象分解成操作系统可理解的元数据，并将此打包让操作系统帮忙传递对象到另一个进程。这个过程是十分复杂繁重的，因此 Google 定义了 AIDL（Android Interface Definition Language）帮助开发者简化工作。一般，你只有在客户端需要访问另一进程的 Service ，且需要 Service 多纯种处理客户端请求时才有必要使用 AIDL；如果只需要在进程内和 Service 通信，只需要实现 Binder 通过 onBind() 返回对象；如果需要进程间通信但不需要并发处理请求，可考虑使用 Messenger，Messenger 底层实现和 AIDL 类似，上层采用 handler-message 方式通信，更为简单易用(具体请参考上文)。
+
 
 
 参考 
 ---
 [Android Activity和Intent机制学习笔记](http://www.cnblogs.com/feisky/archive/2010/01/16/1649081.html)
 
-[Intent 谷歌文档](http://developer.android.com/reference/android/content/Intent.html)
+[Intent](http://developer.android.com/reference/android/content/Intent.html)
 
-[Using a Messenger 谷歌文档](http://developer.android.com/guide/components/bound-services.html#Messenger)
+[Using a Messenger](http://developer.android.com/guide/components/bound-services.html#Messenger)
+
+[Android Interface Definition Language (AIDL)](http://developer.android.com/intl/zh-cn/guide/components/aidl.html)
 
