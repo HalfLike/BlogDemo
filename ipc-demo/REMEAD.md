@@ -216,9 +216,152 @@ public class ClientActivity extends Activity {
 使用 AIDL 通信
 ---
 
-Android 是进程间内存是分离的，因此需要将对象分解成操作系统可理解的元数据，并将此打包让操作系统帮忙传递对象到另一个进程。这个过程是十分复杂繁重的，因此 Google 定义了 AIDL（Android Interface Definition Language）帮助开发者简化工作。一般，你只有在客户端需要访问另一进程的 Service ，且需要 Service 多纯种处理客户端请求时才有必要使用 AIDL；如果只需要在进程内和 Service 通信，只需要实现 Binder 通过 onBind() 返回对象；如果需要进程间通信但不需要并发处理请求，可考虑使用 Messenger，Messenger 底层实现和 AIDL 类似，上层采用 handler-message 方式通信，更为简单易用(具体请参考上文)。
+Android 是进程间内存是分离的，因此需要将对象分解成操作系统可理解的元数据，并将此打包让操作系统帮忙传递对象到另一个进程。这个过程是十分复杂繁重的，因此 Google 定义了 AIDL（Android Interface Definition Language）帮助开发者简化工作。一般，你只有在客户端需要访问另一进程的 Service ，且需要 Service 多纯种处理客户端请求时才有必要使用 AIDL；如果只需要在进程内和 Service 通信，只需要实现 Binder 通过 onBind() 返回对象；如果需要进程间通信但不需要并发处理请求，可考虑使用 Messenger，Messenger 底层实现和 AIDL 类似，上层采用 handler-message 方式通信，更为简单易用(具体请参考上文)。用 AIDL 实现进程间通信的步骤为：
+
+1. 创建 **.aidl** 文件
+*  实现 **.aidl** 文件中定义的接口
+*  向客户端曝露接口
+
+#### 创建 **.aidl** 文件
+AIDL 使用 java 的语法来定义。如果你作用的是 Eclipse，可在 `src/` 目录下创建 `.aidl` 文件，并编译，会在 `gen/` 目录下自动创建同名的 `.java` 文件。下面通过三个示例说明 AIDL 的用法。
+
+```
+// IServer.aidl
+package com.halflike.aidlcommon;
+
+// Declare any non-default types here with import statements
+import com.halflike.aidlcommon.QCEmail;
+import com.halflike.aidlcommon.ICallback;
+
+interface IServer {
+
+    // 获取邮件内容
+    QCEmail getEmail();
+    // 客户端注册回调，用于服务端 service 主动通知客户端
+    boolean registeCallback(ICallback callback);
+    boolean unregisteCallback();
+
+}
+```
+
+```
+// QCMessag.aidl
+package com.halflike.aidlcommon;
+
+parcelable QCEmail;
+
+```
+
+```
+// ICallback.aidl
+package com.halflike.aidlcommon;
+
+// Declare any non-default types here with import statements
+
+oneway interface ICallback {
+
+    // 服务端通知客户端收到一封邮件
+    void receiveEmail();
+
+}
+```
+
+AIDL 接口定义和 java 类似，但对参数、返回值的类型有限制。AIDL 支持的数据类型有：
+
+* java 所有的基本数据类型，包括 **boolean** 和数值类型（int, char, float等）；
+* String，CharSequence，List，Map。List 和 Map 中存储的元素也需要是 AIDL 支持的基本数据类型，或 AIDL 文件定义的接口，或已声明的 pacelable 类。
+
+`QCEmail.aidl`声明了一个序列化的类，可在 `src/` 目录相同包名下实现 `QCEmail.java`，这样其他 `.aidl` 文件只要 **import** 此类即可用于进程间传送此类对象。
+
+`ICallback.aidl` 定义的接口有 `oneway` 修饰，作用是使此接口的调用变为非阻塞的。例如，示例中 server 调用此接口通知 client 接收到邮件，server 不用关心 client 后续的操作不需要等待 client，用 `oneway` 修饰后可以达到这样的效果，不被 client 阻塞继续运行。
+
+还有一点示例并未涉及，所有非基本数据类型的参数**必须指明其方向**，关键词为 `in`，`out`，`inout`.
+非基本数据类型即为引用类型，我们知道在 java 中引用类型作参数时，即可以传递引用对象的值也可以改变引用对象的值。而在 AIDL 中将参数打包传递开销是很大的，十分有必须指明参数的方向。比如，server 传递信息到 client 并不需要同步 client 做的修改时可指定为 `in` 方向：
+
+```
+interface ICallToClient {
+	void startDownload(in Address adr);
+}
+```
+
+#### 实现 **.aidl** 文件中定义的接口
+
+`.aidl` 文件在编译后会生成对应的 `.java`文件，生成的文件包含一个实现了 `IBinder` 的内部类 `Stub`，实现了 `Stub` 的对象可在两个进程间传递。一般是在服务端的 service 的 `onBind()` 方法传递给客户端。关键代码如下示例：
+
+```
+//ServerService.java
+
+@Override
+public IBinder onBind(Intent intent) {
+    return mBinder;
+}
+
+private final IServer.Stub mBinder = new IServer.Stub() {
+    @Override
+    public QCEmail getEmail() throws RemoteException {
+        return mNewEamil;
+    }
+
+    @Override
+    public boolean registeCallback(ICallback callback) throws RemoteException {
+        mCallback = callback;
+        if (mCallback != null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean unregisteCallback() throws RemoteException {
+        mCallback = null;
+        return true;
+    }
+};
+```
 
 
+
+#### 向客户端曝露接口
+
+当客户端通过 `bindService()` 连接服务端 service 时，客户端的 `onServiceConnected()` 方法会收到服务端 `onBind()` 方法返回的 `mBinder`，再通过对应接口的`YourServiceInterface.Stub.asInterface(service)`转换为 AIDL 中定义的接口 `YourServiceInterface`。关键代码如下：
+
+```
+//ClientActivity.java
+
+IServer mServer = null;
+
+// 通过绑定服务端 service，建立连接
+private OnClickListener mConnectListener = new OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        Intent intent = new Intent();
+        intent.setAction("com.halflike.aidlserver.ServerService");
+        bindService(intent,
+                mServiceConnection, Context.BIND_AUTO_CREATE);
+        log("system:Contting...");
+    }
+};    
+
+private ServiceConnection mServiceConnection = new ServiceConnection() {
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder service) {
+        mServer = IServer.Stub.asInterface(service);
+        try {
+            if (mServer.registeCallback(mCallback)) {
+                log("system:Connection and registe callback succeed.");
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onServiceDisconnected(ComponentName name) {
+        mServer = null;
+    }
+};
+```
 
 参考 
 ---

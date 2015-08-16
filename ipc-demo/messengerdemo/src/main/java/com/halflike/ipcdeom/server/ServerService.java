@@ -13,7 +13,7 @@ import android.util.Log;
 
 
 /**
- * Created by luox on 15/8/10.
+ * Created by halflike on 15/8/10.
  */
 public class ServerService extends Service {
 
