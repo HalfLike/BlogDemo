@@ -31,7 +31,7 @@ Android 本身使用的系统加载器，用于加载 App 本身，只能加载�
 
 使用反射可获取插件类的全部方法和成员变量，但使用反射比较复杂而且需要硬编码方法名变量名等，使用继承公共接口的方式更加方便安全。
 ### 代码实现
-下面的示例可在我的 github 中获取 [dynamic-load-demo](https://github.com/HalfLike/dynamic-load-demo)。
+下面的示例可在我的 github 中获取 [BlogDemo](https://github.com/HalfLike/BlogDemo)库，参考示例工程`dynamic-load-demo`。
 这里先定义一个插件类的接口：
 
 ```

@@ -10,6 +10,10 @@ Android 进程间通信-Intent、Messenger、AIDL
 * 使用信使（Messenger）通信
 * 使用 AIDL 通信
 
+关于示例代码
+---
+下面提到的示例代码可在我的Github的[BlogDemo](https://github.com/HalfLike/BlogDemo)库中的`ipc-demo`目录下的示例工程获取。工程是用 *AndroidStudion* 创建，源代码位置 `BlogDemo/ipc-demo/[工程名]/src/main/java/`。
+
 使用 Intent 通信
 ---
 
@@ -365,6 +369,8 @@ private ServiceConnection mServiceConnection = new ServiceConnection() {
 
 参考 
 ---
+[android Activity之间数据传递 Parcelable和Serializable接口的使用](http://blog.csdn.net/js931178805/article/details/8268144) 
+
 [Android Activity和Intent机制学习笔记](http://www.cnblogs.com/feisky/archive/2010/01/16/1649081.html)
 
 [Intent](http://developer.android.com/reference/android/content/Intent.html)
