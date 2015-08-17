@@ -52,7 +52,7 @@ Messenger 在进程间通信的方式和 Hanlder-Message 类似，Hanlder在A进
 下面是使用简单的 Demo 演示了使用 Messenger 如何跨进程通信，服务端为一个 Service，客户端为Activity。通过指定 ServerService 的 `android:process` 属性使其在另一个进程。
 服务端进程代码如下：
 	
-```
+```java
 public class ServerService extends Service {
 
     static final String TAG = "halflike";
@@ -126,7 +126,7 @@ public class ServerService extends Service {
 
 客户端通过 bindService() 连接服务端并获得 Messenger，代码如下：
 
-```
+```java
 public class ClientActivity extends Activity {
 
     static final String TAG = "halflike";
@@ -229,7 +229,7 @@ Android 是进程间内存是分离的，因此需要将对象分解成操作系
 #### 创建 **.aidl** 文件
 AIDL 使用 java 的语法来定义。如果你作用的是 Eclipse，可在 `src/` 目录下创建 `.aidl` 文件，并编译，会在 `gen/` 目录下自动创建同名的 `.java` 文件。下面通过三个示例说明 AIDL 的用法。
 
-```
+```java
 // IServer.aidl
 package com.halflike.aidlcommon;
 
@@ -248,7 +248,7 @@ interface IServer {
 }
 ```
 
-```
+```java
 // QCMessag.aidl
 package com.halflike.aidlcommon;
 
@@ -256,7 +256,7 @@ parcelable QCEmail;
 
 ```
 
-```
+```java
 // ICallback.aidl
 package com.halflike.aidlcommon;
 
@@ -282,7 +282,7 @@ AIDL 接口定义和 java 类似，但对参数、返回值的类型有限制。
 还有一点示例并未涉及，所有非基本数据类型的参数**必须指明其方向**，关键词为 `in`，`out`，`inout`.
 非基本数据类型即为引用类型，我们知道在 java 中引用类型作参数时，即可以传递引用对象的值也可以改变引用对象的值。而在 AIDL 中将参数打包传递开销是很大的，十分有必须指明参数的方向。比如，server 传递信息到 client 并不需要同步 client 做的修改时可指定为 `in` 方向：
 
-```
+```java
 interface ICallToClient {
 	void startDownload(in Address adr);
 }
@@ -292,7 +292,7 @@ interface ICallToClient {
 
 `.aidl` 文件在编译后会生成对应的 `.java`文件，生成的文件包含一个实现了 `IBinder` 的内部类 `Stub`，实现了 `Stub` 的对象可在两个进程间传递。一般是在服务端的 service 的 `onBind()` 方法传递给客户端。关键代码如下示例：
 
-```
+```java
 //ServerService.java
 
 @Override
@@ -330,7 +330,7 @@ private final IServer.Stub mBinder = new IServer.Stub() {
 
 当客户端通过 `bindService()` 连接服务端 service 时，客户端的 `onServiceConnected()` 方法会收到服务端 `onBind()` 方法返回的 `mBinder`，再通过对应接口的`YourServiceInterface.Stub.asInterface(service)`转换为 AIDL 中定义的接口 `YourServiceInterface`。关键代码如下：
 
-```
+```java
 //ClientActivity.java
 
 IServer mServer = null;
